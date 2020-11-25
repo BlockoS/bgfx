@@ -540,32 +540,51 @@ vec4  mod(vec4  _a, vec4  _b) { return _a - _b * floor(_a / _b); }
 #	define atan2(_x, _y) atan(_x, _y)
 #	define mul(_a, _b) ( (_a) * (_b) )
 #	define saturate(_x) clamp(_x, 0.0, 1.0)
-#	define SAMPLER2D(_name, _reg)       uniform sampler2D _name
-#	define SAMPLER2DMS(_name, _reg)     uniform sampler2DMS _name
-#	define SAMPLER3D(_name, _reg)       uniform sampler3D _name
-#	define SAMPLERCUBE(_name, _reg)     uniform samplerCube _name
-#	define SAMPLER2DSHADOW(_name, _reg) uniform sampler2DShadow _name
 
-#	define SAMPLER2DARRAY(_name, _reg)       uniform sampler2DArray _name
-#	define SAMPLER2DMSARRAY(_name, _reg)     uniform sampler2DMSArray _name
-#	define SAMPLERCUBEARRAY(_name, _reg)     uniform samplerCubeArray _name
-#	define SAMPLER2DARRAYSHADOW(_name, _reg) uniform sampler2DArrayShadow _name
+#	define SAMPLER2D(_name, _reg)       layout(binding = _reg) uniform sampler2D _name
+#	define SAMPLER2DMS(_name, _reg)     layout(binding = _reg) uniform sampler2DMS _name
+#	define SAMPLER3D(_name, _reg)       layout(binding = _reg) uniform sampler3D _name
+#	define SAMPLERCUBE(_name, _reg)     layout(binding = _reg) uniform samplerCube _name
+#	define SAMPLER2DSHADOW(_name, _reg) layout(binding = _reg) uniform sampler2DShadow _name
 
-#	define ISAMPLER2D(_name, _reg) uniform isampler2D _name
-#	define USAMPLER2D(_name, _reg) uniform usampler2D _name
-#	define ISAMPLER3D(_name, _reg) uniform isampler3D _name
-#	define USAMPLER3D(_name, _reg) uniform usampler3D _name
+#	define SAMPLER2DARRAY(_name, _reg)       layout(binding = _reg) uniform sampler2DArray _name
+#	define SAMPLER2DMSARRAY(_name, _reg)     layout(binding = _reg) uniform sampler2DMSArray _name
+#	define SAMPLERCUBEARRAY(_name, _reg)     layout(binding = _reg) uniform samplerCubeArray _name
+#	define SAMPLER2DARRAYSHADOW(_name, _reg) layout(binding = _reg) uniform sampler2DArrayShadow _name
 
-#	define texture2DBias(_sampler, _coord, _bias)      texture2D(_sampler, _coord, _bias)
+#	define ISAMPLER2D(_name, _reg) layout(binding = _reg) uniform isampler2D _name
+#	define USAMPLER2D(_name, _reg) layout(binding = _reg) uniform usampler2D _name
+#	define ISAMPLER3D(_name, _reg) layout(binding = _reg) uniform isampler3D _name
+#	define USAMPLER3D(_name, _reg) layout(binding = _reg) uniform usampler3D _name
+
+#	define texture2D(_sampler, _coord)      texture(_sampler, _coord)
+#	define texture3D(_sampler, _coord)      texture(_sampler, _coord)
+#	define texture2DArray(_sampler, _coord) texture(_sampler, _coord)
+#	define textureCube(_sampler, _coord)    texture(_sampler, _coord)
+
+#	define texture2DBias(_sampler, _coord, _bias)      texture(_sampler, _coord, _bias)
+#	define texture3DBias(_sampler, _coord, _bias)      texture(_sampler, _coord, _bias)
+#	define texture2DArrayBias(_sampler, _coord, _bias) texture(_sampler, _coord, _bias)
 #	define textureCubeBias(_sampler, _coord, _bias)    textureCube(_sampler, _coord, _bias)
 
-#	if BGFX_SHADER_LANGUAGE_GLSL >= 130
-#		define texture2D(_sampler, _coord)      texture(_sampler, _coord)
-#		define texture2DArray(_sampler, _coord) texture(_sampler, _coord)
-#		define texture3D(_sampler, _coord)      texture(_sampler, _coord)
-#		define texture2DLod(_sampler, _coord_, _lod)               textureLod(_sampler, _coord, _lod)
-#		define texture2DLodOffset(_sampler, _coord, _lod, _offset) textureLodOffset(_sampler, _coord, _lod, _offset)
-#	endif // BGFX_SHADER_LANGUAGE_GLSL >= 130
+#	define texture2DLod(_sampler, _coord, _lod)      textureLod(_sampler, _coord, _lod)
+#	define texture3DLod(_sampler, _coord, _lod)      textureLod(_sampler, _coord, _lod)
+#	define texture2DArrayLod(_sampler, _coord, _lod) textureLod(_sampler, _coord, _lod)
+#	define textureCubeLod(_sampler, _coord, _lod)    textureLod(_sampler, _coord, _lod)
+
+#	define texture2DLodOffset(_sampler, _coord, _lod, _offset)      textureLodOffset(_sampler, _coord, _lod, _offset)
+#	define texture3DLodOffset(_sampler, _coord, _lod, _offset)      textureLodOffset(_sampler, _coord, _lod, _offset)
+#	define texture2DArrayLodOffset(_sampler, _coord, _lod, _offset) textureLodOffset(_sampler, _coord, _lod, _offset)
+
+#	define texture2DProjLod(_sampler, _coord, _lod) textureProjLod(_sampler, _coord, _lod)
+#	define texture3DProjLod(_sampler, _coord, _lod) textureProjLod(_sampler, _coord, _lod)
+
+#	define texture2DGrad(_sampler, _coord, _dPdx, _dPdy)   textureGrad(_sampler, _coord, _dPdx, _dPdy)
+#	define texture3DGrad(_sampler, _coord, _dPdx, _dPdy)   textureGrad(_sampler, _coord, _dPdx, _dPdy)
+#	define textureCubeGrad(_sampler, _coord, _dPdx, _dPdy) textureGrad(_sampler, _coord, _dPdx, _dPdy)
+
+#	define texture2DProjGrad(_sampler, _coord, _dPdx, _dPdy)  textureProjGrad(_sampler, _coord, _dPdx, _dPdy)
+#	define texture3DProjGrad(_sampler, _coord, _dPdx, _dPdy)  textureProjGrad(_sampler, _coord, _dPdx, _dPdy)
 
 vec3 instMul(vec3 _vec, mat3 _mtx) { return mul(_vec, _mtx); }
 vec3 instMul(mat3 _mtx, vec3 _vec) { return mul(_mtx, _vec); }
@@ -582,11 +601,11 @@ vec2 vec2_splat(float _x) { return vec2(_x, _x); }
 vec3 vec3_splat(float _x) { return vec3(_x, _x, _x); }
 vec4 vec4_splat(float _x) { return vec4(_x, _x, _x, _x); }
 
-#if BGFX_SHADER_LANGUAGE_GLSL >= 130 || BGFX_SHADER_LANGUAGE_HLSL || BGFX_SHADER_LANGUAGE_PSSL || BGFX_SHADER_LANGUAGE_SPIRV || BGFX_SHADER_LANGUAGE_METAL
+#if BGFX_SHADER_LANGUAGE_GLSL || BGFX_SHADER_LANGUAGE_HLSL || BGFX_SHADER_LANGUAGE_PSSL || BGFX_SHADER_LANGUAGE_SPIRV || BGFX_SHADER_LANGUAGE_METAL
 uvec2 uvec2_splat(uint _x) { return uvec2(_x, _x); }
 uvec3 uvec3_splat(uint _x) { return uvec3(_x, _x, _x); }
 uvec4 uvec4_splat(uint _x) { return uvec4(_x, _x, _x, _x); }
-#endif // BGFX_SHADER_LANGUAGE_GLSL >= 130 || BGFX_SHADER_LANGUAGE_HLSL || BGFX_SHADER_LANGUAGE_PSSL || BGFX_SHADER_LANGUAGE_SPIRV || BGFX_SHADER_LANGUAGE_METAL
+#endif // BGFX_SHADER_LANGUAGE_GLSL || BGFX_SHADER_LANGUAGE_HLSL || BGFX_SHADER_LANGUAGE_PSSL || BGFX_SHADER_LANGUAGE_SPIRV || BGFX_SHADER_LANGUAGE_METAL
 
 mat4 mtxFromRows(vec4 _0, vec4 _1, vec4 _2, vec4 _3)
 {
