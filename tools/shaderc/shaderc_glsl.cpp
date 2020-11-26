@@ -5,6 +5,9 @@
 
 #include "shaderc.h"
 
+#include <csignal>
+#include <cstdlib>
+
 BX_PRAGMA_DIAGNOSTIC_PUSH()
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4100) // error C4100: 'inclusionDepth' : unreferenced formal parameter
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4265) // error C4265: 'spv::spirvbin_t': class has virtual functions, but destructor is not virtual
@@ -329,6 +332,17 @@ namespace bgfx { namespace glsl
 		return true;
 	}
 
+	// As exceptions are disabled, spirv-cross will call abort().
+	// We catch the abort signal and exit here.
+	// If we don't do this shaderc will generate a core dump under linux.
+	// The other issue is that you can't easily embedded shaderc code.
+	// No matter what, the easiest way to solve this issues is to use exceptions...
+	static void dummy_handler(int signal)
+	{
+		glslang::FinalizeProcess();
+		std::exit(EXIT_FAILURE);
+	}
+
 	static bool toGLSL(std::vector<unsigned int> &bytecode, uint32_t version, bool es, std::string &out) {
 		spirv_cross::CompilerGLSL *compiler = new spirv_cross::CompilerGLSL(bytecode.data(), bytecode.size());
 		
@@ -340,12 +354,10 @@ namespace bgfx { namespace glsl
 		bool ret = true;
 		out.clear();
 		
-		out = compiler->compile();				// exceptions are disabled. The program will brutally exit if an error occured.
-		if(out.empty()) {
-			bx::printf("Compilation error!\n");
-			ret = false;
-		}
-		
+		auto previous_handler = std::signal(SIGABRT, dummy_handler);
+		out = compiler->compile();
+		std::signal(SIGABRT, previous_handler);
+
 		delete compiler;
 		return ret;
 	}
