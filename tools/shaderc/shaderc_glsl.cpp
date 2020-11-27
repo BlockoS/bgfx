@@ -339,6 +339,7 @@ namespace bgfx { namespace glsl
 	// No matter what, the easiest way to solve this issues is to use exceptions...
 	static void dummy_handler(int signal)
 	{
+		BX_UNUSED(signal);
 		glslang::FinalizeProcess();
 		std::exit(EXIT_FAILURE);
 	}
