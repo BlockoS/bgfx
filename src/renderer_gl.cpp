@@ -6148,6 +6148,7 @@ namespace bgfx { namespace gl
 					const bool usesTextureMS    = !bx::findIdentifierMatch(code, s_ARB_texture_multisample).isEmpty();
 					const bool usesPacking      = !bx::findIdentifierMatch(code, s_ARB_shading_language_packing).isEmpty();
 					const bool usesInterpQ      = !bx::findIdentifierMatch(code, s_intepolationQualifier).isEmpty();
+					const bool usesTextureSize  = !bx::findIdentifierMatch(code, "textureSize").isEmpty();
 
 					uint32_t version = BX_ENABLED(BX_PLATFORM_OSX) ? 120
 						:  usesTextureArray
@@ -6157,6 +6158,7 @@ namespace bgfx { namespace gl
 						|| usesUint
 						|| usesTexelFetch
 						|| usesGpuShader5
+						|| usesTextureSize
 						|| usesInterpQ   ? 130
 						: usesTextureLod ? 120
 						: 120

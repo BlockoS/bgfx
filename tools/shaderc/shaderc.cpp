@@ -2076,6 +2076,7 @@ namespace bgfx
 								const bool usesTextureArray       = !bx::findIdentifierMatch(input, s_textureArray).isEmpty();
 								const bool usesPacking            = !bx::findIdentifierMatch(input, s_ARB_shading_language_packing).isEmpty();
 								const bool usesViewportLayerArray = !bx::findIdentifierMatch(input, s_ARB_shader_viewport_layer_array).isEmpty();
+								const bool usesTextureSize  = !bx::findIdentifierMatch(input, "textureSize").isEmpty();
 
 								if (0 == essl)
 								{
@@ -2083,6 +2084,7 @@ namespace bgfx
 										|| !bx::findIdentifierMatch(input, s_130).isEmpty()
 										|| usesInterpolationQualifiers
 										|| usesTexelFetch
+										|| usesTextureSize
 										) );
 
 									bx::stringPrintf(code, "#version %s\n", need130 ? "130" : _options.profile.c_str());
@@ -2210,7 +2212,7 @@ namespace bgfx
 								}
 								else
 								{
-									if (usesInterpolationQualifiers)
+									if (usesInterpolationQualifiers || usesTextureSize)
 									{
 										bx::stringPrintf(code, "#version 300 es\n");
 										bx::stringPrintf(code, "#define attribute in\n");
