@@ -228,6 +228,8 @@ public:
 		m_color[1] = 0.875;
 		m_color[2] = 0.62;
 
+		m_cursor[0] = m_cursor[1] = 0.5f;
+
 		imguiCreate();
 	}
 
@@ -363,17 +365,28 @@ public:
 				);
 
 			ImGui::ColorEdit3("Object tint", m_color); 
+			ImGui::Separator();
+
+			ImGui::SliderFloat("Sub-pixel aliasing removal", &m_fxaaParams[0], 0.0f, 1.0f);
+			ImGui::SliderFloat("Local contrast threshold", &m_fxaaParams[1], 0.0f, 1.0f);
+			ImGui::SliderFloat("local contrast fine tune", &m_fxaaParams[2], 0.0f, 1.0f);
+			ImGui::Separator();
+
+			if(m_mouseState.m_buttons[entry::MouseButton::Middle]) {
+				m_cursor[0] = m_mouseState.m_mx;
+				m_cursor[1] = m_mouseState.m_my;
+			}
 
 			ImVec2 uv[2];
-			uv[1].x = (m_mouseState.m_mx + 8.f) / (float)m_width;
-			uv[0].x = (m_mouseState.m_mx - 8.f) / (float)m_width;
+			uv[1].x = (m_cursor[0] + 8.f) / (float)m_width;
+			uv[0].x = (m_cursor[0] - 8.f) / (float)m_width;
 			if(m_caps->originBottomLeft) {
-				uv[0].y = (m_height-m_mouseState.m_my + 8.f) / (float)m_height;
-				uv[1].y = (m_height-m_mouseState.m_my - 8.f) / (float)m_height;
+				uv[0].y = (m_height-m_cursor[1] + 8.f) / (float)m_height;
+				uv[1].y = (m_height-m_cursor[1] - 8.f) / (float)m_height;
 			}
 			else {
-				uv[0].y = (m_mouseState.m_my + 8.f) / (float)m_height;
-				uv[1].y = (m_mouseState.m_my - 8.f) / (float)m_height;
+				uv[0].y = (m_cursor[1] + 8.f) / (float)m_height;
+				uv[1].y = (m_cursor[1] - 8.f) / (float)m_height;
 			}
 
 			ImVec2 size( m_width / 5.0f - 16.0f,  m_width / 5.0f - 16.0f);
@@ -426,6 +439,8 @@ public:
 
 	float m_color[4];
 	float m_fxaaParams[4];
+
+	float m_cursor[2];
 
 	float m_texelHalf;
 };
