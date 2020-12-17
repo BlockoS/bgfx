@@ -151,7 +151,7 @@ public:
 		// Set up screen clears
 		bgfx::setViewClear(RENDER_PASS_ALBEDO
 			, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-			, 0x303030ff
+			, 0x30303030																// Don't forget to set alpha to the luminance of the RGB clear color if FXAA_GREEN_AS_LUMA is not set.
 			, 1.0f
 			, 0
 			);
@@ -361,6 +361,8 @@ public:
 				, NULL
 				, 0
 				);
+
+			ImGui::ColorEdit3("Object tint", m_color); 
 
 			ImVec2 uv[2];
 			uv[1].x = (m_mouseState.m_mx + 8.f) / (float)m_width;
