@@ -42,6 +42,7 @@ rebuild:
 #	@make -s --no-print-directory rebuild -C 39-assao
 	@make -s --no-print-directory rebuild -C 40-svt
 	@make -s --no-print-directory rebuild -C 42-bunnylod
+	@make -s --no-print-directory rebuild -C 43-fxaa
 
 rebuild-embedded:
 	@make -s --no-print-directory rebuild -C 02-metaballs

@@ -6335,12 +6335,20 @@ namespace bgfx { namespace gl
 					}
 
 					bx::write(&writer
-						, "#define texture2DLod    textureLod\n"
-						  "#define texture3DLod    textureLod\n"
-						  "#define textureCubeLod  textureLod\n"
-						  "#define texture2DGrad   textureGrad\n"
-						  "#define texture3DGrad   textureGrad\n"
-						  "#define textureCubeGrad textureGrad\n"
+						, "#define texture2DLod            textureLod\n"
+						  "#define texture3DLod            textureLod\n"
+						  "#define textureCubeLod          textureLod\n"
+						  "#define texture2DGrad           textureGrad\n"
+						  "#define texture3DGrad           textureGrad\n"
+						  "#define textureCubeGrad         textureGrad\n"
+						  "#define texture2DLodOffset      textureLodOffset\n"
+						  "#define texture2DArrayLodOffset textureLodOffset\n"
+						  "#define texture2DProjLod        textureProjLod\n"
+						  "#define texture3DProjLodOffset  textureProjLodOffset\n"
+						  "#define texture2DProjGrad       textureProjGrad\n"
+						  "#define textureCubeLod          textureLod\n"
+						  "#define textureCubeLodOffset    textureLodOffset\n"
+						  "#define textureCubeGrad         textureGrad\n"
 						);
 
 					if (m_type == GL_FRAGMENT_SHADER)
@@ -6441,15 +6449,20 @@ namespace bgfx { namespace gl
 
 				bx::write(&writer
 					, "#version 430\n"
-					  "#define texture2DLod             textureLod\n"
-					  "#define texture2DLodOffset       textureLodOffset\n"
-					  "#define texture2DArrayLod        textureLod\n"
-					  "#define texture2DArrayLodOffset  textureLodOffset\n"
-					  "#define texture3DLod             textureLod\n"
-					  "#define textureCubeLod           textureLod\n"
-					  "#define texture2DGrad            textureGrad\n"
-					  "#define texture3DGrad            textureGrad\n"
-					  "#define textureCubeGrad          textureGrad\n"
+					  "#define texture2DLod            textureLod\n"
+					  "#define texture3DLod            textureLod\n"
+					  "#define textureCubeLod          textureLod\n"
+					  "#define texture2DGrad           textureGrad\n"
+					  "#define texture3DGrad           textureGrad\n"
+					  "#define textureCubeGrad         textureGrad\n"
+					  "#define texture2DLodOffset      textureLodOffset\n"
+					  "#define texture2DArrayLodOffset textureLodOffset\n"
+					  "#define texture2DProjLod        textureProjLod\n"
+					  "#define texture3DProjLodOffset  textureProjLodOffset\n"
+					  "#define texture2DProjGrad       textureProjGrad\n"
+					  "#define textureCubeLod          textureLod\n"
+					  "#define textureCubeLodOffset    textureLodOffset\n"
+					  "#define textureCubeGrad         textureGrad\n"
 					);
 
 				int32_t verLen = bx::strLen("#version 430\n");

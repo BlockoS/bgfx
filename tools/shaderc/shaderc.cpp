@@ -156,6 +156,17 @@ namespace bgfx
 		NULL
 	};
 
+	static const char* s_textureLodOffset[] =
+	{
+		"texture2DLodOffset",
+		"texture2DArrayLodOffset",
+		"texture2DProjLod",
+		"texture3DProjLodOffset",
+		"texture2DProjGrad",
+		"textureCubeLod",
+		"textureCubeLofOffset"
+	};
+
 	const char* s_uniformTypeName[] =
 	{
 		"int",  "int",
@@ -2076,7 +2087,8 @@ namespace bgfx
 								const bool usesTextureArray       = !bx::findIdentifierMatch(input, s_textureArray).isEmpty();
 								const bool usesPacking            = !bx::findIdentifierMatch(input, s_ARB_shading_language_packing).isEmpty();
 								const bool usesViewportLayerArray = !bx::findIdentifierMatch(input, s_ARB_shader_viewport_layer_array).isEmpty();
-								const bool usesTextureSize  = !bx::findIdentifierMatch(input, "textureSize").isEmpty();
+								const bool usesTextureSize        = !bx::findIdentifierMatch(input, "textureSize").isEmpty();
+								const bool usesTextureLodOffset   = !bx::findIdentifierMatch(input, s_textureLodOffset).isEmpty();
 
 								if (0 == essl)
 								{
@@ -2085,6 +2097,7 @@ namespace bgfx
 										|| usesInterpolationQualifiers
 										|| usesTexelFetch
 										|| usesTextureSize
+										|| usesTextureLodOffset
 										) );
 
 									bx::stringPrintf(code, "#version %s\n", need130 ? "130" : _options.profile.c_str());
@@ -2176,7 +2189,27 @@ namespace bgfx
 											);
 									}
 
-									if (ARB_shader_texture_lod)
+									if (need130)
+									{
+										bx::stringPrintf(code,
+											"#define texture2DLod            textureLod\n"
+											"#define texture3DLod            textureLod\n"
+											"#define textureCubeLod          textureLod\n"
+											"#define texture2DGrad           textureGrad\n"
+											"#define texture3DGrad           textureGrad\n"
+											"#define textureCubeGrad         textureGrad\n"
+											"#define texture2DLodOffset      textureLodOffset\n"
+											"#define texture2DArrayLodOffset textureLodOffset\n"
+											"#define texture2DProjLod        textureProjLod\n"
+											"#define texture3DProjLodOffset  textureProjLodOffset\n"
+											"#define texture2DProjGrad       textureProjGrad\n"
+											"#define textureCubeLod          textureLod\n"
+											"#define textureCubeLofOffset    textureLodOffset\n"
+											"#define textureCubeGrad         textureGrad\n"
+											);
+										
+									}
+									else if (ARB_shader_texture_lod)
 									{
 										bx::stringPrintf(code,
 											"#define texture2DProjLod  texture2DProjLodARB\n"
@@ -2212,15 +2245,17 @@ namespace bgfx
 								}
 								else
 								{
-									if (usesInterpolationQualifiers || usesTextureSize)
+									if (usesInterpolationQualifiers || usesTextureSize || usesTextureLodOffset)
 									{
+										essl = 3;
 										bx::stringPrintf(code, "#version 300 es\n");
 										bx::stringPrintf(code, "#define attribute in\n");
 										bx::stringPrintf(code, "#define varying %s\n"
 											, 'f' == _options.shaderType ? "in" : "out"
 											);
 									}
-									else if (essl == 2)
+									
+									if (essl == 2)
 									{
 										code +=
 											"mat2 transpose(mat2 _mtx)\n"
@@ -2268,17 +2303,37 @@ namespace bgfx
 									// This will be stripped later.
 									if (usesTextureLod)
 									{
-										bx::stringPrintf(code
-											, "#extension GL_EXT_shader_texture_lod : enable\n"
-											  "#define texture2DLod      texture2DLodEXT\n"
-											  "#define texture2DGrad     texture2DGradEXT\n"
-											  "#define texture2DProjLod  texture2DProjLodEXT\n"
-											  "#define texture2DProjGrad texture2DProjGradEXT\n"
-											  "#define textureCubeLod    textureCubeLodEXT\n"
-											  "#define textureCubeGrad   textureCubeGradEXT\n"
-											);
+										if(essl < 3) {
+											bx::stringPrintf(code
+												, "#extension GL_EXT_shader_texture_lod : enable\n"
+												"#define texture2DLod      texture2DLodEXT\n"
+												"#define texture2DGrad     texture2DGradEXT\n"
+												"#define texture2DProjLod  texture2DProjLodEXT\n"
+												"#define texture2DProjGrad texture2DProjGradEXT\n"
+												"#define textureCubeLod    textureCubeLodEXT\n"
+												"#define textureCubeGrad   textureCubeGradEXT\n"
+												);
+										}
+										else
+										{
+											bx::stringPrintf(code,
+												"#define texture2DLod            textureLod\n"
+												"#define texture3DLod            textureLod\n"
+												"#define textureCubeLod          textureLod\n"
+												"#define texture2DGrad           textureGrad\n"
+												"#define texture3DGrad           textureGrad\n"
+												"#define textureCubeGrad         textureGrad\n"
+												"#define texture2DLodOffset      textureLodOffset\n"
+												"#define texture2DArrayLodOffset textureLodOffset\n"
+												"#define texture2DProjLod        textureProjLod\n"
+												"#define texture3DProjLodOffset  textureProjLodOffset\n"
+												"#define texture2DProjGrad       textureProjGrad\n"
+												"#define textureCubeLod          textureLod\n"
+												"#define textureCubeLofOffset    textureLodOffset\n"
+												"#define textureCubeGrad         textureGrad\n"
+												);
+										}
 									}
-
 									if (!bx::findIdentifierMatch(input, s_OES_standard_derivatives).isEmpty() )
 									{
 										bx::stringPrintf(code, "#extension GL_OES_standard_derivatives : enable\n");
@@ -2326,29 +2381,38 @@ namespace bgfx
 											, "#extension GL_EXT_texture_array : enable\n"
 											);
 									}
-
-									bx::stringPrintf(code
-										, "#define ivec2 vec2\n"
-										  "#define ivec3 vec3\n"
-										  "#define ivec4 vec4\n"
-										  "#define uvec2 vec2\n"
-										  "#define uvec3 vec3\n"
-										  "#define uvec4 vec4\n"
-									);
+									if(essl < 3)
+									{
+										bx::stringPrintf(code
+											, "#define ivec2 vec2\n"
+											"#define ivec3 vec3\n"
+											"#define ivec4 vec4\n"
+											"#define uvec2 vec2\n"
+											"#define uvec3 vec3\n"
+											"#define uvec4 vec4\n"
+										);
+									}
 								}
 							}
 							else
 							{
 								bx::stringPrintf(code, "#version %d\n", glsl);
 
-								bx::stringPrintf(code
-									, "#define texture2DLod      textureLod\n"
-									  "#define texture2DGrad     textureGrad\n"
-									  "#define texture2DProjLod  textureProjLod\n"
-									  "#define texture2DProjGrad textureProjGrad\n"
-									  "#define textureCubeLod    textureLod\n"
-									  "#define textureCubeGrad   textureGrad\n"
-									  "#define texture3D         texture\n"
+								bx::stringPrintf(code,
+									"#define texture2DLod            textureLod\n"
+									"#define texture3DLod            textureLod\n"
+									"#define textureCubeLod          textureLod\n"
+									"#define texture2DGrad           textureGrad\n"
+									"#define texture3DGrad           textureGrad\n"
+									"#define textureCubeGrad         textureGrad\n"
+									"#define texture2DLodOffset      textureLodOffset\n"
+									"#define texture2DArrayLodOffset textureLodOffset\n"
+									"#define texture2DProjLod        textureProjLod\n"
+									"#define texture3DProjLodOffset  textureProjLodOffset\n"
+									"#define texture2DProjGrad       textureProjGrad\n"
+									"#define textureCubeLod          textureLod\n"
+									"#define textureCubeLofOffset    textureLodOffset\n"
+									"#define textureCubeGrad         textureGrad\n"
 									);
 
 								bx::stringPrintf(code, "#define attribute in\n");
@@ -2379,7 +2443,6 @@ namespace bgfx
 							{
 								code += _comment;
 								code += preprocessor.m_preprocessed;
-
 								compiled = compileGLSLShader(_options, metal ? BX_MAKEFOURCC('M', 'T', 'L', 0) : essl, code, _writer);
 							}
 						}
